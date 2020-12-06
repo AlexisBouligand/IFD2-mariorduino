@@ -1,1 +1,39 @@
-<mxfile host="app.diagrams.net" modified="2020-12-06T15:53:53.250Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" version="13.10.9" etag="54QWnkXqEFmumEt2g7gD" type="github"><diagram id="FZ-KUTpKiYjLyvMNN2SE">UzV2zq1wL0osyPDNT0nNUTV2VTV2LsrPL4GwciucU3NyVI0MMlNUjV1UjYwMgFjVyA2HrCFY1qAgsSg1rwSLBiADYTaQg2Y1AA==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2020-12-06T18:16:35.351Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36" etag="QiV9fPdH8nYIxai0m-3s" version="13.10.9" type="github">
+  <diagram id="FZ-KUTpKiYjLyvMNN2SE" name="Page-1">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-1" value="&lt;font style=&quot;font-size: 14px&quot;&gt;lampe de bureau &lt;br&gt;connectée&lt;/font&gt;&amp;nbsp;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="330" width="194" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-2" value="température" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="180" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-11" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" source="DodHTxLkwAYYeLfAvjPW-3" target="DodHTxLkwAYYeLfAvjPW-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="410" />
+              <mxPoint x="320" y="298" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-3" value="téléphone de l&#39;utilisateur" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="370" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-4" value="humidité" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="470" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-5" value="électricité" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="560" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-6" value="utilisateur" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="230" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DodHTxLkwAYYeLfAvjPW-7" value="bureau" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="150" width="120" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
