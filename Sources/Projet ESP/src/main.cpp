@@ -7,19 +7,18 @@
 
 WiFiClient wificlient;
 PubSubClient client(wificlient);
-const char ssid[] = "NUMERICABLE-1790";
-const char pwd[] = "19900EC0E6";
-const char hostname[14] = "192.168.0.20";
-const char* topicIn = "/LAMP/IN/#";
+
+const char ssid[] = ""; //SSID of the wifi
+const char pwd[] = "";  //PASSWORD of the wifi
+const char hostname[14] = ""; //IP adress of the server
+const char* topicIn = "/LAMP/IN/#"; //The topics the ESP needs to subscribe to;
+const char* clientName = ""; //the name of the client (Preferably not MesC*******SurTonFront)
 
 String inString;
+unsigned long lastMillis = 0;
 
-//void messageReceived(String &topic, String &payload) {
-//  String str = topic + ">" + payload + "|" ;
-//  Serial.print(str);
-//}
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char* topic, byte* payload, unsigned int length) { // fucntion that is called when a mesage is recieved from the server
   Serial.print(topic);
   Serial.print('>');
   for (unsigned int i = 0; i < length; i++) {
@@ -28,7 +27,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print('|');
 }
 
-void connectWIFI(){
+
+void connectWIFI(){// connect to wifi
   while(WiFi.status() != WL_CONNECTED){
     Serial.print("w|");
     delay(100);
@@ -37,11 +37,9 @@ void connectWIFI(){
 }
 
 
-
-void connectMQTT() {
-  
+void connectMQTT() {//connect to MQTT;
   Serial.print("m|");
-  while (!client.connect("MesCouillesSurTonFront")) {
+  while (!client.connect(clientName)) {
     Serial.print("m|");
     delay(100);
   }
@@ -50,8 +48,9 @@ void connectMQTT() {
   Serial.print("s|");
 }
 
-unsigned long lastMillis = 0;
-void alive(){
+
+
+void alive(){//Check if the ESSP is still connected to the borker and sends an heartbeat every 3 seceonds
   if (millis() - lastMillis > 3000) {
     lastMillis = millis();
 
@@ -63,46 +62,29 @@ void alive(){
       connectWIFI();
     }
     client.publish("/LAMP/OUT/ALIVE", "Bonsoir");
-    client.flush();
     client.loop();
   }
 }
 
-void
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, pwd);
-  client.setKeepAlive(120);
+  client.setKeepAlive(30);
   client.setServer(hostname, 1883);
   client.setCallback(callback);
   connectWIFI();
   connectMQTT();
 }
 
-void EspEvent(){
-  while (Serial3.available()) {    
-    char inChar = Serial3.read();
-    inString += inChar;
-    if(inChar == '|'){
-      Serial.println(inString);
-
-      if(inString.indexOf("p|")!=-1){
-        client.publish("/LAMP/OUT/PHONE", "1");
-      }
-
-    
-
-      inString = "";
-    }
-  }
+void MegaEvent(){
+  //a faire vite
 }
 
 void loop() {
   if(!client.connected()){
     connectMQTT();
   }
-  
   if(WiFi.status() != WL_CONNECTED){
     connectWIFI();
   }
