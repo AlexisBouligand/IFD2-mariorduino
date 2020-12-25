@@ -1,4 +1,4 @@
-#include<Arduino.h>
+#include <Arduino.h>
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include <string.h>
@@ -43,6 +43,12 @@ int photoPin = 0;
 int tempPin = 0;
 int interrupPin = 0;
 
+//variables for the phone timer
+int defaultValue = 20; //nombre de minutes par défaut
+int timerMinutes = 20;
+int timerSeconds = 0;
+unsigned long int timerTicks = 0;
+bool isDone = false;
 
 void oledSetup(){//setup the oled screen, no arguments, no return values
   if(!OLED.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3D for 128x64
@@ -143,12 +149,37 @@ void EspEvent(){//Fucntion used to handle messages recived from the ESP
   }
 }
 
+bool checkphone(){
+  if(digitalRead(interrupPin) == HIGH){
+    return true;
+  }else{
+    return false;
+  }
+}
 
-void time(){//calculate time
+void phonetimer(){
+  if(isDone == false){
+    if((millis() - timerTicks) > 1000){
+      timerTicks = millis();
+      timerSeconds--;
+      if(timerSeconds <= -1){
+        timerSeconds = 59;
+        timerMinutes--;
+        if(timerMinutes <= -1){
+          isDone = true;
+        }
+      }
+    }
+
+    oledPrint(String(timerMinutes)+":"+String(timerSeconds),"Continuez comme ca!");
+  }else{
+    oledPrint("Fini!","Félicitation !");
+  }
+}
 
 
 String time(){//Update the time and return a String of it
-  if (millis() - ticks> 1000) {//update time
+  if ((millis() - ticks) > 1000) {
     ticks = millis();
     seconds++;
     if (seconds == 60){
@@ -172,26 +203,36 @@ String time(){//Update the time and return a String of it
 
 
 void loop(){
-  
   timeStr = time();
   time();
   EspEvent();
   //updateSensors() Create a function to update the values of the sensors, maybe run in every ten seconds
   //light(); creat a function to handle changing the mode, luminiosity ect ect...
-  //checkphone(); check is a phone was inserted and handle the situation if it was
+  
 
   if(state == IDLE){
     oledPrint(timeStr,"Hello World !");
+    if(checkphone()){
+      state = PHONEIN;
+    }
   }
 
   if(state == PHONEIN){
-    oledPrint(timeStr,"Phone in");
-    //phonetimer(); handle the timer for the phone
+    phonetimer();
+    if(!checkphone()){
+      if(isDone == false){
+        oledPrint("Oh non","Vous avez échoué");
+        delay(1000);
+      }
+      timerTicks = 0;
+      timerMinutes = defaultValue;
+      timerSeconds = 0;
+      isDone = false;
+      state = IDLE;
+    }
+
   }
-
-
 }
-
 
 // MQTT topics:
 // /LAMP/IN/
