@@ -32,12 +32,10 @@ int lummode = 0;//change if the luminiosity is automatic or manual;
 int lumvalue = 0;//the luminiosity value if lightmode is set to manual
 
 //Value for the pins, to change according to the shield
-int rgbPin1Red = 0;
-int rgbPin1Green = 0;
-int rgbPin1Blue = 0;
-int rgbPin2Red = 0;
-int rgbPin2Green = 0;
-int rgbPin2Blue = 0;
+int rgbPinRed = 0;
+int rgbPinGreen = 0;
+int rgbPinBlue = 0;
+
 int buttonPin = 0;
 int potoPin = 0;
 int photoPin = 0;
@@ -209,15 +207,41 @@ void updateSensors(){
 
 
 
-void light(String TOPIC){
+void light(String TOPIC, int* r_indent, int* b_indent, int* g_indent){
   if(TOPIC == "ENVIRONMENT"){
     //program if we want to update the led according to the environment
   } else if(TOPIC == "FIXED_COLOR"){
     //program which set an unique color according to the user request
     //askColor()
+    analogWrite(rgbPinRed, *r_indent);
+    analogWrite(rgbPinBlue, *b_indent);
+    analogWrite(rgbPinGreen, *g_indent);
   } else if(TOPIC == "CHANGING_COLOR"){
     //program which set different color into a loop a certain speed which is chosen by the user
+    //askColor()
+    int speed = 0;
     //askSpeed()
+    analogWrite(rgbPinRed, *r_indent);
+    analogWrite(rgbPinBlue, *b_indent);
+    analogWrite(rgbPinGreen, *g_indent);
+    delay(speed);
+    if(*r_indent > 1023){
+      *r_indent = 0;
+      *b_indent++;
+      *g_indent++;
+    } else if(*b_indent > 1023){
+      *b_indent = 0;
+      *r_indent++;
+      *g_indent++;
+    } else if(*g_indent >1023){
+      *g_indent = 0;
+      *r_indent++;
+      *b_indent++;
+    } else{
+      *r_indent++;
+      *b_indent++;
+      *g_indent++;
+    }
   }
 }
 
