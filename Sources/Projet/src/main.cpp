@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <string.h>
 
+
 #define SCREEN_WIDTH 128 
 #define SCREEN_HEIGHT 64 // contant for the OLED screen
 #define OLED_RESET     5
@@ -201,6 +202,24 @@ String time(){//Update the time and return a String of it
   return str;
 }
 
+void updateSensors(){
+  int i = 1;
+  //we will read the datas of the sensors 
+}
+
+
+
+void light(String TOPIC){
+  if(TOPIC == "ENVIRONMENT"){
+    //program if we want to update the led according to the environment
+  } else if(TOPIC == "FIXED_COLOR"){
+    //program which set an unique color according to the user request
+    //askColor()
+  } else if(TOPIC == "CHANGING_COLOR"){
+    //program which set different color into a loop a certain speed which is chosen by the user
+    //askSpeed()
+  }
+}
 
 void loop(){
   timeStr = time();
