@@ -30,6 +30,7 @@ int blue = 255;
 int lightmode = 1;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 int lummode = 0;//change if the luminiosity is automatic or manual;
 int lumvalue = 0;//the luminiosity value if lightmode is set to manual
+int speed = 0;//speed of the changing colors
 
 //Value for the pins, to change according to the shield
 int rgbPinRed = 0;
@@ -131,6 +132,9 @@ void EspEvent(){//Fucntion used to handle messages recived from the ESP
       }
       if(inString.indexOf("/LAMP/IN/BLUE>")!=-1){
         blue = inString.substring(14,17).toInt();
+      }
+      if(inString.indexOf("/LAMP/IN/SPEED>")!=-1){
+        speed = inString.substring(15,16).toInt();
       }
 
       if(inString.indexOf("/LAMP/IN/LIGHTMODE>")!=-1){//lightmode was updated on the MQTT server
