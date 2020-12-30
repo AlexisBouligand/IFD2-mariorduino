@@ -28,6 +28,7 @@ int red = 255;
 int green = 255; // color values for the LED lights
 int blue = 255;
 int lightmode = 1;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
 int lumvalue = 0;//the luminiosity value if lightmode is set to manual
 int speed = 0;//speed of the changing colors
@@ -206,46 +207,52 @@ String time(){//Update the time and return a String of it
 
 void updateSensors(){
   int i = 1;
-  //we will read the datas of the sensors 
+  //we will read the datas of the sensors
 }
 
 
 
-void light(String TOPIC, int* r_indent, int* b_indent, int* g_indent){
-  if(TOPIC == "ENVIRONMENT"){
+void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed){
+  if(lightmode == 0){
+    //programm if we want to switch off the lights
+    analogWrite(rgbPinRed, 0);
+    analogWrite(rgbPinBlue, 0);
+    analogWrite(rgbPinGreen, 0);
+  } else if(lightmode == 1){
     //program if we want to update the led according to the environment
-  } else if(TOPIC == "FIXED_COLOR"){
+  } else if(lightmode == 2){
     //program which set an unique color according to the user request
-    //askColor()
     analogWrite(rgbPinRed, *r_indent);
     analogWrite(rgbPinBlue, *b_indent);
     analogWrite(rgbPinGreen, *g_indent);
-  } else if(TOPIC == "CHANGING_COLOR"){
+  } else if(lightmode == 3){
     //program which set different color into a loop a certain speed which is chosen by the user
-    //askColor()
-    int speed = 0;
-    //askSpeed()
-    analogWrite(rgbPinRed, *r_indent);
-    analogWrite(rgbPinBlue, *b_indent);
-    analogWrite(rgbPinGreen, *g_indent);
-    delay(speed);
-    if(*r_indent > 1023){
-      *r_indent = 0;
-      *b_indent++;
-      *g_indent++;
-    } else if(*b_indent > 1023){
-      *b_indent = 0;
-      *r_indent++;
-      *g_indent++;
-    } else if(*g_indent >1023){
-      *g_indent = 0;
-      *r_indent++;
-      *b_indent++;
-    } else{
-      *r_indent++;
-      *b_indent++;
-      *g_indent++;
+    if((millis() - ticks_color)>speed){
+      ticks_color = millis();
+
+      analogWrite(rgbPinRed, *r_indent);
+      analogWrite(rgbPinBlue, *b_indent);
+      analogWrite(rgbPinGreen, *g_indent);
+      delay(speed);
+      if(*r_indent > 255){
+        *r_indent = 0;
+        *b_indent++;
+        *g_indent++;
+      } else if(*b_indent > 255){
+        *b_indent = 0;
+        *r_indent++;
+        *g_indent++;
+      } else if(*g_indent >255){
+        *g_indent = 0;
+        *r_indent++;
+        *b_indent++;
+      } else{
+        *r_indent++;
+        *b_indent++;
+        *g_indent++;
+      }
     }
+    
   }
 }
 
