@@ -2,7 +2,7 @@
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
 #include <string.h>
-
+#include <math.h>
 
 #define SCREEN_WIDTH 128 
 #define SCREEN_HEIGHT 64 // contant for the OLED screen
@@ -12,6 +12,13 @@
 #define LOADING 0
 #define IDLE 1
 #define PHONEIN 2
+
+// Different lightmode
+#define OFF 0
+#define TEMPERATURE 1
+#define FIX 2
+#define CHANGING 3
+
 int state = IDLE;
 
 String inString; //Input string used to recieve commands from the ESP via serial3
@@ -28,10 +35,16 @@ int red = 255;
 int green = 255; // color values for the LED lights
 int blue = 255;
 int lightmode = 1;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
 int lumvalue = 0;//the luminiosity value if lightmode is set to manual
 int speed = 0;//speed of the changing colors
+
+//Variables linked with the sensor of luminosity and temperature
+int enlightment = 0;
+int temperature = 0;
+unsigned long int ticks_sensor = 0;
 
 //Value for the pins, to change according to the shield
 int rgbPinRed = 0;
@@ -206,26 +219,47 @@ String time(){//Update the time and return a String of it
 }
 
 void updateSensors(){
-  int i = 1;
   //we will read the datas of the sensors
+  if((millis() - ticks_sensor)>10000){ //We read datas of the sensors every 10 seconds
+    ticks_sensor = millis();
+    //Check for the temperature sensor
+    temperature = map(analogRead(tempPin),0,255,0,100); // 0 to 100 is the new scale (it has no unit)
+    Serial.print("The temperature is : ");
+    Serial.println(temperature);
+
+    //Check for the light sensor
+    enlightment = map(analogRead(photoPin),0,255,0,100); //0 to 100 is the new scale (it has no unit)
+    Serial.print("The enlightment is : ");
+    Serial.println(enlightment);
+  }
 }
 
 
 
 void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed){
-  if(lightmode == 0){
+  if(lightmode == OFF){
+
     //programm if we want to switch off the lights
     analogWrite(rgbPinRed, 0);
     analogWrite(rgbPinBlue, 0);
     analogWrite(rgbPinGreen, 0);
-  } else if(lightmode == 1){
+  } else if(lightmode == TEMPERATURE){
+
     //program if we want to update the led according to the environment
-  } else if(lightmode == 2){
+    analogWrite(rgbPinGreen, 127);
+    red_ratio = (float) temperature * 0.01;
+    *r_indent = round(255*red_ratio);
+    *b_indent = 255 - *r_indent;
+    analogWrite(rgbPinRed, *r_indent);
+    analogWrite(rgbPinBlue, *b_indent);
+  } else if(lightmode == FIX){
+
     //program which set an unique color according to the user request
     analogWrite(rgbPinRed, *r_indent);
     analogWrite(rgbPinBlue, *b_indent);
     analogWrite(rgbPinGreen, *g_indent);
-  } else if(lightmode == 3){
+  } else if(lightmode == CHANGING){
+
     //program which set different color into a loop a certain speed which is chosen by the user
     if((millis() - ticks_color)>speed){
       ticks_color = millis();
@@ -234,23 +268,78 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
       analogWrite(rgbPinBlue, *b_indent);
       analogWrite(rgbPinGreen, *g_indent);
       delay(speed);
-      if(*r_indent > 255){
-        *r_indent = 0;
-        *b_indent++;
-        *g_indent++;
-      } else if(*b_indent > 255){
-        *b_indent = 0;
-        *r_indent++;
-        *g_indent++;
-      } else if(*g_indent >255){
-        *g_indent = 0;
-        *r_indent++;
-        *b_indent++;
+      if((*r_indent == *b_indent)&&(*r_indent == *g_indent)){
+        if(*r_indent >255){
+          *r_indent = 0;
+          *b_indent = 0;
+          *g_indent = 0;
+        } else{
+          *r_indent++;
+          *b_indent++;
+          *g_indent++;
+        }
+      } else if(*r_indent == *b_indent){
+        if(*r_indent >255){
+          *r_indent = 0;
+          *b_indent = 0;
+          *g_indent++;
+        } else if(*g_indent >255){
+          *r_indent++;
+          *b_indent++;
+          *g_indent = 0;
+        } else{
+          *r_indent++;
+          *b_indent++;
+          *g_indent++;
+        }
+      } else if(*r_indent == *g_indent){
+        if(*r_indent >255){
+          *r_indent = 0;
+          *b_indent++;
+          *g_indent = 0;
+        } else if(*b_indent >255){
+          *r_indent++;
+          *b_indent = 0;
+          *g_indent++;
+        } else{
+          *r_indent++;
+          *b_indent++;
+          *g_indent++;
+        }
+      } else if(*g_indent == *b_indent){
+        if(*g_indent >255){
+          *r_indent++;
+          *b_indent = 0;
+          *g_indent = 0;
+        } else if(*r_indent >255){
+          *r_indent = 0;
+          *b_indent++;
+          *g_indent++;
+        } else{
+          *r_indent++;
+          *b_indent++;
+          *g_indent++;
+        }
       } else{
-        *r_indent++;
-        *b_indent++;
-        *g_indent++;
+        if(*r_indent > 255){
+          *r_indent = 0;
+          *b_indent++;
+          *g_indent++;
+        } else if(*b_indent > 255){
+          *b_indent = 0;
+          *r_indent++;
+          *g_indent++;
+        } else if(*g_indent >255){
+          *g_indent = 0;
+          *r_indent++;
+          *b_indent++;
+        } else{
+          *r_indent++;
+          *b_indent++;
+          *g_indent++;
+        }
       }
+      
     }
     
   }
@@ -260,8 +349,8 @@ void loop(){
   timeStr = time();
   time();
   EspEvent();
-  //updateSensors() Create a function to update the values of the sensors, maybe run in every ten seconds
-  //light(); creat a function to handle changing the mode, luminiosity ect ect...
+  updateSensors(); //Create a function to update the values of the sensors, maybe run in every ten seconds
+  light(lightmode, &red, &blue, &green, speed); //create a function to handle changing the mode, luminiosity ect ect...
   
 
   if(state == IDLE){
