@@ -34,7 +34,7 @@ unsigned long int ticks = 0;
 int red = 255;
 int green = 255; // color values for the LED lights
 int blue = 255;
-int lightmode = 1;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+int lightmode = 2;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
@@ -47,15 +47,15 @@ int temperature = 0;
 unsigned long int ticks_sensor = 0;
 
 //Value for the pins, to change according to the shield
-int rgbPinRed = 0;
-int rgbPinGreen = 0;
-int rgbPinBlue = 0;
+int rgbPinRed = 2;
+int rgbPinGreen = 3;
+int rgbPinBlue = 4;
 
 int buttonPin = 0;
 int potoPin = 0;
-int photoPin = 0;
-int tempPin = 0;
-int interrupPin = 0;
+int photoPin = A0;
+int tempPin = A1;
+int interrupPin = 7;
 
 //variables for the phone timer
 int defaultValue = 20; //nombre de minutes par défaut
@@ -228,9 +228,9 @@ void updateSensors(){
     Serial.println(temperature);
 
     //Check for the light sensor
-    enlightment = map(analogRead(photoPin),0,255,0,100); //0 to 100 is the new scale (it has no unit)
+    enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
     Serial.print("The enlightment is : ");
-    Serial.println(enlightment);
+    Serial.println(analogRead(photoPin));
   }
 }
 
@@ -255,9 +255,9 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
   } else if(lightmode == FIX){
 
     //program which set an unique color according to the user request
-    analogWrite(rgbPinRed, *r_indent);
-    analogWrite(rgbPinBlue, *b_indent);
-    analogWrite(rgbPinGreen, *g_indent);
+    analogWrite(rgbPinRed, red);
+    analogWrite(rgbPinBlue, blue);
+    analogWrite(rgbPinGreen, green);
   } else if(lightmode == CHANGING){
 
     //program which set different color into a loop a certain speed which is chosen by the user
@@ -267,7 +267,6 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
       analogWrite(rgbPinRed, *r_indent);
       analogWrite(rgbPinBlue, *b_indent);
       analogWrite(rgbPinGreen, *g_indent);
-      delay(speed);
       if((*r_indent == *b_indent)&&(*r_indent == *g_indent)){
         if(*r_indent >255){
           *r_indent = 0;

@@ -8,9 +8,9 @@
 WiFiClient wificlient;
 PubSubClient client(wificlient);
 
-const char ssid[] = ""; //SSID of the wifi
-const char pwd[] = "";  //PASSWORD of the wifi
-const char hostname[14] = ""; //IP adress of the server
+const char ssid[] = "NUMERICABLE-1790"; //SSID of the wifi
+const char pwd[] = "19900EC0E6";  //PASSWORD of the wifi
+const char hostname[14] = "192.168.0.20"; //IP adress of the server
 const char* topicIn = "/LAMP/IN/#"; //The topics the ESP needs to subscribe to;
 const char* clientName = ""; //the name of the client (Preferably not MesC*******SurTonFront)
 
