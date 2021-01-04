@@ -248,10 +248,10 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
     //program if we want to update the led according to the environment
     analogWrite(rgbPinGreen, 127);
     red_ratio = (float) temperature * 0.01;
-    *r_indent = round(255*red_ratio);
-    *b_indent = 255 - *r_indent;
-    analogWrite(rgbPinRed, *r_indent);
-    analogWrite(rgbPinBlue, *b_indent);
+    red = round(255*red_ratio);
+    blue = 255 - red;
+    analogWrite(rgbPinRed, red);
+    analogWrite(rgbPinBlue, blue);
   } else if(lightmode == FIX){
 
     //program which set an unique color according to the user request
@@ -264,78 +264,78 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
     if((millis() - ticks_color)>speed){
       ticks_color = millis();
 
-      analogWrite(rgbPinRed, *r_indent);
-      analogWrite(rgbPinBlue, *b_indent);
-      analogWrite(rgbPinGreen, *g_indent);
-      if((*r_indent == *b_indent)&&(*r_indent == *g_indent)){
-        if(*r_indent >255){
-          *r_indent = 0;
-          *b_indent = 0;
-          *g_indent = 0;
+      analogWrite(rgbPinRed, red);
+      analogWrite(rgbPinBlue, blue);
+      analogWrite(rgbPinGreen, green);
+      if((red == blue)&&(red == green)){
+        if(red >255){
+          red = 0;
+          blue = 0;
+          green = 0;
         } else{
-          *r_indent++;
-          *b_indent++;
-          *g_indent++;
+          red++;
+          blue++;
+          green++;
         }
-      } else if(*r_indent == *b_indent){
-        if(*r_indent >255){
-          *r_indent = 0;
-          *b_indent = 0;
-          *g_indent++;
-        } else if(*g_indent >255){
-          *r_indent++;
-          *b_indent++;
-          *g_indent = 0;
+      } else if(red == blue){
+        if(red >255){
+          red = 0;
+          blue = 0;
+          green++;
+        } else if(green >255){
+          red++;
+          blue++;
+          green = 0;
         } else{
-          *r_indent++;
-          *b_indent++;
-          *g_indent++;
+          red++;
+          blue++;
+          green++;
         }
-      } else if(*r_indent == *g_indent){
-        if(*r_indent >255){
-          *r_indent = 0;
-          *b_indent++;
-          *g_indent = 0;
-        } else if(*b_indent >255){
-          *r_indent++;
-          *b_indent = 0;
-          *g_indent++;
+      } else if(red == green){
+        if(red >255){
+          red = 0;
+          blue++;
+          green = 0;
+        } else if(blue >255){
+          red++;
+          blue = 0;
+          green++;
         } else{
-          *r_indent++;
-          *b_indent++;
-          *g_indent++;
+          red++;
+          blue++;
+          green++;
         }
-      } else if(*g_indent == *b_indent){
-        if(*g_indent >255){
-          *r_indent++;
-          *b_indent = 0;
-          *g_indent = 0;
-        } else if(*r_indent >255){
-          *r_indent = 0;
-          *b_indent++;
-          *g_indent++;
+      } else if(green == blue){
+        if(green >255){
+          red++;
+          blue = 0;
+          green = 0;
+        } else if(red >255){
+          red = 0;
+          blue++;
+          green++;
         } else{
-          *r_indent++;
-          *b_indent++;
-          *g_indent++;
+          red++;
+          blue++;
+          green++;
         }
       } else{
-        if(*r_indent > 255){
-          *r_indent = 0;
-          *b_indent++;
-          *g_indent++;
-        } else if(*b_indent > 255){
-          *b_indent = 0;
-          *r_indent++;
-          *g_indent++;
-        } else if(*g_indent >255){
-          *g_indent = 0;
-          *r_indent++;
-          *b_indent++;
+        if(red > 255){
+          red = 0;
+          blue++;
+          green++;
+        } else if(blue > 255){
+          blue = 0;
+          red++;
+          green++;
+        } else if(green >255){
+          green = 0;
+          red++;
+          blue++;
         } else{
-          *r_indent++;
-          *b_indent++;
-          *g_indent++;
+          red++;
+          blue++;
+          green++;
         }
       }
       
