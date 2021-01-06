@@ -37,7 +37,7 @@ unsigned long int ticks = 0;
 int red = 255;
 int green = 255; // color values for the LED lights
 int blue = 255;
-int lightmode = 2;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+int lightmode = TEMPERATURE;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
@@ -247,6 +247,7 @@ void updateTemperatureHumiditySensor(){
   else {
     Serial.print(F("Temperature: "));
     temperature = map( (long) event.temperature *100,1000,3000,0,100);
+    Serial.println(event.temperature*100);
     Serial.print(event.temperature);
     Serial.println(F("°C"));
   }
@@ -271,7 +272,7 @@ void updateSensors(){
     updateTemperatureHumiditySensor();
 
     //Check for the light sensor
-    enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
+    enlightment = map(analogRead(photoPin)*1.2,0,1023,0,100); //0 to 100 is the new scale (it has no unit)
     Serial.print("The enlightment is : ");
     Serial.println(analogRead(photoPin));
   }
@@ -280,6 +281,7 @@ void updateSensors(){
 
 
 void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed){
+  lightmode = TEMPERATURE;
   if(lightmode == OFF){
 
     //programm if we want to switch off the lights
