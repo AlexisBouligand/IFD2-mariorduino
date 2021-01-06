@@ -34,15 +34,15 @@ int minutes = 0; //time values
 int seconds = 0;
 unsigned long int ticks = 0;
 
-int red = 255;
-int green = 255; // color values for the LED lights
-int blue = 255;
-int lightmode = TEMPERATURE;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+int red = 0;
+int green = 50; // color values for the LED lights
+int blue = 100;
+int lightmode = CHANGING;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
 int lumvalue = 0;//the luminiosity value if lightmode is set to manual
-int speed = 0;//speed of the changing colors
+int speed = 10;//speed of the changing colors
 
 //Variables linked with the sensor of luminosity and temperature
 int enlightment = 0;
@@ -281,7 +281,6 @@ void updateSensors(){
 
 
 void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed){
-  lightmode = TEMPERATURE;
   if(lightmode == OFF){
 
     //programm if we want to switch off the lights
