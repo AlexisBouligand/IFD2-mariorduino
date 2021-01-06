@@ -3,6 +3,9 @@
 #include <Adafruit_GFX.h>
 #include <string.h>
 #include <math.h>
+#include <DHT.h>
+#include <Adafruit_Sensor.h>
+#include <DHT_U.h>
 
 #define SCREEN_WIDTH 128 
 #define SCREEN_HEIGHT 64 // contant for the OLED screen
@@ -44,17 +47,25 @@ int speed = 0;//speed of the changing colors
 //Variables linked with the sensor of luminosity and temperature
 int enlightment = 0;
 int temperature = 0;
+int humidity = 0;
 unsigned long int ticks_sensor = 0;
+
+
+// Connections with the pins
 
 //Value for the pins, to change according to the shield
 int rgbPinRed = 2;
 int rgbPinGreen = 3;
 int rgbPinBlue = 4;
 
+//Pin for the temperature and humidity sensor
+int tempPin = 5;
+#define DHTTYPE    DHT11
+DHT_Unified dht(tempPin, DHTTYPE);
+
 int buttonPin = 0;
 int potoPin = 0;
 int photoPin = A0;
-int tempPin = A1;
 int interrupPin = 7;
 
 //variables for the phone timer
@@ -99,6 +110,12 @@ void setup() {
   oledSetup();
   Serial.begin(115200);//Start connection with the computer (for debugging purposes)
   Serial3.begin(115200);//Start connection with the ESP
+  dht.begin();
+  Serial.println(F("DHTxx Unified Sensor Example"));
+  // Print temperature sensor details.
+  sensor_t sensor;
+  dht.temperature().getSensor(&sensor);
+  dht.humidity().getSensor(&sensor);
 }
 
 
@@ -166,6 +183,9 @@ void EspEvent(){//Fucntion used to handle messages recived from the ESP
   }
 }
 
+
+
+
 bool checkphone(){
   if(digitalRead(interrupPin) == HIGH){
     return true;
@@ -218,14 +238,37 @@ String time(){//Update the time and return a String of it
   return str;
 }
 
+void updateTemperatureHumiditySensor(){
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  if (isnan(event.temperature)) {
+    Serial.println(F("Error reading temperature!"));
+  }
+  else {
+    Serial.print(F("Temperature: "));
+    temperature = map( (long) event.temperature *100,1000,3000,0,100);
+    Serial.print(event.temperature);
+    Serial.println(F("°C"));
+  }
+  // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+  if (isnan(event.relative_humidity)) {
+    Serial.println(F("Error reading humidity!"));
+  }
+  else {
+    Serial.print(F("Humidity: "));
+    humidity = event.relative_humidity;
+    Serial.print(event.relative_humidity);
+    Serial.println(F("%"));
+  }
+}
+
 void updateSensors(){
   //we will read the datas of the sensors
-  if((millis() - ticks_sensor)>10000){ //We read datas of the sensors every 10 seconds
+  if((millis() - ticks_sensor)>1000){ //We read datas of the sensors every 10 seconds
     ticks_sensor = millis();
     //Check for the temperature sensor
-    temperature = map(analogRead(tempPin),0,255,0,100); // 0 to 100 is the new scale (it has no unit)
-    Serial.print("The temperature is : ");
-    Serial.println(temperature);
+    updateTemperatureHumiditySensor();
 
     //Check for the light sensor
     enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
@@ -350,7 +393,6 @@ void loop(){
   EspEvent();
   updateSensors(); //Create a function to update the values of the sensors, maybe run in every ten seconds
   light(lightmode, &red, &blue, &green, speed); //create a function to handle changing the mode, luminiosity ect ect...
-  
 
   if(state == IDLE){
     oledPrint(timeStr,"Hello World !");
