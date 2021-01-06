@@ -34,9 +34,13 @@ int minutes = 0; //time values
 int seconds = 0;
 unsigned long int ticks = 0;
 
-int red = 0;
-int green = 50; // color values for the LED lights
-int blue = 100;
+int red =10;
+int green = 51; // color values for the LED lights
+int blue = 62;
+
+bool red_increase = true;
+bool blue_increase = true;
+bool green_increase = true;
 int lightmode = CHANGING;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
@@ -246,7 +250,7 @@ void updateTemperatureHumiditySensor(){
   }
   else {
     Serial.print(F("Temperature: "));
-    temperature = map( (long) event.temperature *100,1000,3000,0,100);
+    temperature = map( (int) (event.temperature *100),1000,3000,0,100);
     Serial.println(event.temperature*100);
     Serial.print(event.temperature);
     Serial.println(F("°C"));
@@ -311,77 +315,42 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
       analogWrite(rgbPinRed, red);
       analogWrite(rgbPinBlue, blue);
       analogWrite(rgbPinGreen, green);
-      if((red == blue)&&(red == green)){
-        if(red >255){
-          red = 0;
-          blue = 0;
-          green = 0;
-        } else{
-          red++;
-          blue++;
-          green++;
-        }
-      } else if(red == blue){
-        if(red >255){
-          red = 0;
-          blue = 0;
-          green++;
-        } else if(green >255){
-          red++;
-          blue++;
-          green = 0;
-        } else{
-          red++;
-          blue++;
-          green++;
-        }
-      } else if(red == green){
-        if(red >255){
-          red = 0;
-          blue++;
-          green = 0;
-        } else if(blue >255){
-          red++;
-          blue = 0;
-          green++;
-        } else{
-          red++;
-          blue++;
-          green++;
-        }
-      } else if(green == blue){
-        if(green >255){
-          red++;
-          blue = 0;
-          green = 0;
-        } else if(red >255){
-          red = 0;
-          blue++;
-          green++;
-        } else{
-          red++;
-          blue++;
-          green++;
-        }
-      } else{
-        if(red > 255){
-          red = 0;
-          blue++;
-          green++;
-        } else if(blue > 255){
-          blue = 0;
-          red++;
-          green++;
-        } else if(green >255){
-          green = 0;
-          red++;
-          blue++;
-        } else{
-          red++;
-          blue++;
-          green++;
-        }
+      
+      if(red >=255){
+        red_increase = false;
+      } else if(red <= 0){
+        red_increase = true;
       }
+      if(green >=255){
+        green_increase = false;
+      } else if(green <= 0){
+        green_increase = true;
+      }
+      if(blue >=255){
+        blue_increase = false;
+      } else if(blue <= 0){
+        blue_increase = true;
+      }
+      
+      if(red_increase == true){
+        red++;
+      } else{
+        red--;
+      }
+
+      if(green_increase == true){
+        green++;
+      } else{
+        green--;
+      }
+
+      if(blue_increase == true){
+        blue++;
+      } else{
+        blue--;
+      }
+      
+      
       
     }
     
