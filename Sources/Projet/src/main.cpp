@@ -34,9 +34,9 @@ int minutes = 0; //time values
 int seconds = 0;
 unsigned long int ticks = 0;
 
-int red =10;
-int green = 51; // color values for the LED lights
-int blue = 62;
+int red =50;
+int green = 0; // color values for the LED lights
+int blue = 100;
 
 bool red_increase = true;
 bool blue_increase = true;
@@ -50,7 +50,9 @@ int speed = 10;//speed of the changing colors
 
 //Variables linked with the sensor of luminosity and temperature
 int enlightment = 0;
-int temperature = 0;
+int enlightement_scale = 0;
+int temperature_scale = 0;
+int temp = 0;
 int humidity = 0;
 unsigned long int ticks_sensor = 0;
 
@@ -250,9 +252,9 @@ void updateTemperatureHumiditySensor(){
   }
   else {
     Serial.print(F("Temperature: "));
-    temperature = map( (int) (event.temperature *100),1000,3000,0,100);
-    Serial.println(event.temperature*100);
-    Serial.print(event.temperature);
+    temp = map(event.temperature,10,30,0,100);
+    temperature_scale = (int)temp;
+    Serial.println(event.temperature);
     Serial.println(F("°C"));
   }
   // Get humidity event and print its value.
@@ -268,6 +270,16 @@ void updateTemperatureHumiditySensor(){
   }
 }
 
+void convert_enlightement(){
+  if((enlightment>=0)&&(enlightment<= 30)){
+    enlightement_scale = map(enlightment,0,30,1,10);
+  } else if(enlightment<0){
+    enlightement_scale = 1;
+  } else{
+    enlightement_scale = 10;
+  }
+}
+
 void updateSensors(){
   //we will read the datas of the sensors
   if((millis() - ticks_sensor)>1000){ //We read datas of the sensors every 10 seconds
@@ -276,12 +288,12 @@ void updateSensors(){
     updateTemperatureHumiditySensor();
 
     //Check for the light sensor
-    enlightment = map(analogRead(photoPin)*1.2,0,1023,0,100); //0 to 100 is the new scale (it has no unit)
+    enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
+    convert_enlightement();
     Serial.print("The enlightment is : ");
     Serial.println(analogRead(photoPin));
   }
 }
-
 
 
 void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed){
@@ -294,27 +306,40 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
   } else if(lightmode == TEMPERATURE){
 
     //program if we want to update the led according to the environment
-    analogWrite(rgbPinGreen, 127);
-    red_ratio = (float) temperature * 0.01;
-    red = round(255*red_ratio);
-    blue = 255 - red;
-    analogWrite(rgbPinRed, red);
-    analogWrite(rgbPinBlue, blue);
+    analogWrite(rgbPinGreen, 50/enlightement_scale);
+    if(temperature_scale < 0){
+      blue = 255;
+      red = 0;
+    } else if(temperature_scale > 100){
+      red = 255;
+      blue = 0;
+    } else{
+      red_ratio = (float)temperature_scale * 0.01;
+      red = round(255*red_ratio);
+      
+      blue = 255 - red;
+    }
+    //Serial.print("Value of Red : ");
+    //Serial.println(red);
+    //Serial.print("Value of Blue : ");
+    //Serial.println(blue);
+    analogWrite(rgbPinRed, red/enlightement_scale);
+    analogWrite(rgbPinBlue, blue/enlightement_scale);
   } else if(lightmode == FIX){
 
     //program which set an unique color according to the user request
-    analogWrite(rgbPinRed, red);
-    analogWrite(rgbPinBlue, blue);
-    analogWrite(rgbPinGreen, green);
+    analogWrite(rgbPinRed, red/enlightement_scale);
+    analogWrite(rgbPinBlue, blue/enlightement_scale);
+    analogWrite(rgbPinGreen, green/enlightement_scale);
   } else if(lightmode == CHANGING){
 
     //program which set different color into a loop a certain speed which is chosen by the user
     if((millis() - ticks_color)>speed){
       ticks_color = millis();
 
-      analogWrite(rgbPinRed, red);
-      analogWrite(rgbPinBlue, blue);
-      analogWrite(rgbPinGreen, green);
+      analogWrite(rgbPinRed, red/enlightement_scale);
+      analogWrite(rgbPinBlue, blue/enlightement_scale);
+      analogWrite(rgbPinGreen, green/enlightement_scale);
       
       if(red >=255){
         red_increase = false;
