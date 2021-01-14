@@ -41,7 +41,7 @@ int blue = 100;
 bool red_increase = true;
 bool blue_increase = true;
 bool green_increase = true;
-int lightmode = CHANGING;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+int lightmode = TEMPERATURE;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
@@ -60,12 +60,12 @@ unsigned long int ticks_sensor = 0;
 // Connections with the pins
 
 //Value for the pins, to change according to the shield
-int rgbPinRed = 2;
-int rgbPinGreen = 3;
-int rgbPinBlue = 4;
+int rgbPinRed = 8;
+int rgbPinGreen = 9;
+int rgbPinBlue = 10;
 
 //Pin for the temperature and humidity sensor
-int tempPin = 5;
+int tempPin = 11;
 #define DHTTYPE    DHT11
 DHT_Unified dht(tempPin, DHTTYPE);
 
@@ -292,6 +292,7 @@ void updateSensors(){
     //Check for the light sensor
     enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
     convert_enlightement();
+    enlightement_scale = 1;
     Serial.print("The enlightment is : ");
     Serial.println(analogRead(photoPin));
   }
@@ -308,7 +309,7 @@ void light(int lightmode, int* r_indent, int* b_indent, int* g_indent, int speed
   } else if(lightmode == TEMPERATURE){
 
     //program if we want to update the led according to the environment
-    analogWrite(rgbPinGreen, 50/enlightement_scale);
+    analogWrite(rgbPinGreen, 0);
     if(temperature_scale < 0){
       blue = 255;
       red = 0;
