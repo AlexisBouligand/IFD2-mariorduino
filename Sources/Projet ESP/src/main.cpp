@@ -17,6 +17,7 @@ const char* clientName = ""; //the name of the client (Preferably not MesC******
 String inString;
 unsigned long lastMillis = 0;
 
+int buffer = 0;
 
 void callback(char* topic, byte* payload, unsigned int length) { // fucntion that is called when a mesage is recieved from the server
   Serial.print(topic);
@@ -78,7 +79,15 @@ void setup() {
 }
 
 void MegaEvent(){
-  //a faire vite
+  while (Serial.available()) {    
+    char inChar = Serial.read();
+    inString += inChar;
+    if(inChar == '|'){ 
+      if(inString.indexOf("PHONE")!=-1){//Esp is connecting to wifi
+        client.publish("/LAMP/OUT/PHONE","1")
+      }
+    }
+  }
 }
 
 void loop() {

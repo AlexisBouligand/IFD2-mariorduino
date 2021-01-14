@@ -69,8 +69,7 @@ int tempPin = 5;
 #define DHTTYPE    DHT11
 DHT_Unified dht(tempPin, DHTTYPE);
 
-int buttonPin = 0;
-int potoPin = 0;
+int buttonPin = 12;
 int photoPin = A0;
 int interrupPin = 7;
 
@@ -278,6 +277,9 @@ void convert_enlightement(){
   } else{
     enlightement_scale = 10;
   }
+  if (lummode == 1){
+    enlightement_scale = lumvalue;
+  }
 }
 
 void updateSensors(){
@@ -410,6 +412,14 @@ void loop(){
       state = IDLE;
     }
 
+  }
+
+  if(digitalRead(buttonPin) == LOW){
+    while(digitalRead(buttonPin) == LOW){}
+    lightmode++;
+    if(lightmode ==  4){
+      lightmode = 0;
+    }
   }
 }
 
