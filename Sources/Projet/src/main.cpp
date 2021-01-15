@@ -41,7 +41,7 @@ int blue = 100;
 bool red_increase = true;
 bool blue_increase = true;
 bool green_increase = true;
-int lightmode = TEMPERATURE;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
+int lightmode = CHANGING;//lightmode, changes the way the lamp behaves: Breathing, temperature based, custom color and off
 float red_ratio = 0.5; //ratio of red when the mode of the light depend of the temperature
 unsigned long int ticks_color = 0;
 int lummode = 0;//change if the luminiosity is automatic or manual;
@@ -69,9 +69,9 @@ int tempPin = 11;
 #define DHTTYPE    DHT11
 DHT_Unified dht(tempPin, DHTTYPE);
 
-int buttonPin = 12;
+int buttonPin = 13;
 int photoPin = A0;
-int interrupPin = 7;
+int interrupPin = 12;
 
 //variables for the phone timer
 int defaultValue = 20; //nombre de minutes par défaut
@@ -192,7 +192,7 @@ void EspEvent(){//Fucntion used to handle messages recived from the ESP
 
 
 bool checkphone(){
-  if(digitalRead(interrupPin) == HIGH){
+  if(digitalRead(buttonPin) == HIGH){
     return true;
   }else{
     return false;
@@ -292,9 +292,9 @@ void updateSensors(){
     //Check for the light sensor
     enlightment = map(analogRead(photoPin),0,1023,0,100); //0 to 100 is the new scale (it has no unit)
     convert_enlightement();
-    enlightement_scale = 1;
     Serial.print("The enlightment is : ");
-    Serial.println(analogRead(photoPin));
+    Serial.println(enlightement_scale);
+    Serial.println(enlightement_scale);
   }
 }
 
@@ -395,6 +395,7 @@ void loop(){
   if(state == IDLE){
     oledPrint(timeStr,"Hello World !");
     if(checkphone()){
+      Serial3.print("PHONE>1|");
       state = PHONEIN;
     }
   }
@@ -403,7 +404,8 @@ void loop(){
     phonetimer();
     if(!checkphone()){
       if(isDone == false){
-        oledPrint("Oh non","Vous avez échoué");
+        Serial3.print("PHONE>0|");
+        oledPrint("Oh non","Vous avez echoue");
         delay(1000);
       }
       timerTicks = 0;
@@ -414,13 +416,8 @@ void loop(){
     }
 
   }
-
-  if(digitalRead(buttonPin) == LOW){
-    while(digitalRead(buttonPin) == LOW){}
-    lightmode++;
-    if(lightmode ==  4){
-      lightmode = 0;
-    }
+  if(interrupPin == HIGH){
+    Serial.println("interrupteur");
   }
 }
 

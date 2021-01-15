@@ -8,12 +8,13 @@
 WiFiClient wificlient;
 PubSubClient client(wificlient);
 
-const char ssid[] = "NUMERICABLE-1790"; //SSID of the wifi
-const char pwd[] = "19900EC0E6";  //PASSWORD of the wifi
-const char hostname[14] = "192.168.0.20"; //IP adress of the server
+const char ssid[] = "Point chaud"; //SSID of the wifi
+const char pwd[] = "Hotspot69";  //PASSWORD of the wifi
+const char hostname[14] = "192.168.43.1"; //IP adress of the server
 const char* topicIn = "/LAMP/IN/#"; //The topics the ESP needs to subscribe to;
 const char* clientName = ""; //the name of the client (Preferably not MesC*******SurTonFront)
 
+char inChar;
 String inString;
 unsigned long lastMillis = 0;
 
@@ -82,10 +83,14 @@ void MegaEvent(){
   while (Serial.available()) {    
     char inChar = Serial.read();
     inString += inChar;
-    if(inChar == '|'){ 
-      if(inString.indexOf("PHONE")!=-1){//Esp is connecting to wifi
-        client.publish("/LAMP/OUT/PHONE","1")
+    if(inChar == '|'){
+      char strBuffer[2];
+      if(inString.indexOf("PHONE>")!=-1){//Esp is connecting to wifi
+        buffer = inString.substring(6,7).toInt();
+        itoa(buffer,strBuffer,2);
+        client.publish("/LAMP/OUT/PHONE",strBuffer);
       }
+      inString = "";
     }
   }
 }
@@ -98,4 +103,5 @@ void loop() {
     connectWIFI();
   }
   alive();
+  MegaEvent();
 }
